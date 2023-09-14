@@ -47,6 +47,7 @@ with app.app_context():
             minutes_to_read=randint(1,20),
             is_member_only = rc([True, False, False])
         )
+        article.user = 
 
         articles.append(article)
 

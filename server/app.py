@@ -18,6 +18,15 @@ db.init_app(app)
 
 api = Api(app)
 
+
+@app.before_request
+def control_access():
+    user_id = session.get('user_id', None)
+    if not user_id and ( request.endpoint == 'member_article' or request.endpoint =='member_index' ) :
+        return {'error': 'Unauthorized'}, 401
+
+
+
 class ClearSession(Resource):
 
     def delete(self):
@@ -85,14 +94,29 @@ class CheckSession(Resource):
         return {}, 401
 
 class MemberOnlyIndex(Resource):
-    
+        
     def get(self):
-        pass
+        articles = Article.query.filter_by(is_member_only=1).all()
+
+        artcile_dict = [article.to_dict() for article in articles]
+
+        return artcile_dict
+
+
+  
 
 class MemberOnlyArticle(Resource):
+      
+      def get(self, id):
+        article = Article.query.filter_by(id=id).first()
+
+        return article.to_dict()
+    # user = session.get('user_id',None)
+
     
-    def get(self, id):
-        pass
+
+    
+            
 
 api.add_resource(ClearSession, '/clear', endpoint='clear')
 api.add_resource(IndexArticle, '/articles', endpoint='article_list')
